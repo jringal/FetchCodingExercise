@@ -1,7 +1,7 @@
 # FetchCodingExercise
 Coding Exercise for Fetch
 
-Exercise is completed utilizing Python, PyTest, and SeleniumBase.
+Exercise is completed utilizing Python, PyTest, and SeleniumBase. See Fetch_Coding_Exercise_SDET.pdf for exercise details.
 
 SeleniumBase (sbase) is a Python framework built off of Selenium to simplify many features, including method definitions, error logging, and test run report generation, among other features. Details can be found at https://seleniumbase.io. <br />
 Make sure to have pip and Python pre-installed.
