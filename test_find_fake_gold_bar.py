@@ -8,7 +8,7 @@ class TestCase(BaseCase):
             self.type(
                 f'input[data-side="left"][data-index="{i}"]', bar_list[i]
             )
-            self.sleep(0.2)
+            self.sleep(0.1)
 
     # Function to fill right bowl with entered list
     def fill_right_bowl(self, bar_list=[]):
@@ -16,27 +16,23 @@ class TestCase(BaseCase):
             self.type(
                 f'input[data-side="right"][data-index="{i}"]', bar_list[i]
             )
-            self.sleep(0.2)
+            self.sleep(0.1)
 
     # Function to split the lighter bowl in half to the left and right bowls
     def split_weights(self, result="", left_bowl=[], right_bowl=[]):
         print(f'Old Left Bowl: {left_bowl}')
         print(f'Old Right Bowl: {right_bowl}')
-        print(len(left_bowl))
-        print(left_bowl[:len(left_bowl)//2])
-        print(left_bowl[len(left_bowl)//2:])
-        # import ipdb; ipdb.set_trace()
         if "<" == result:
+            print('New Left Bowl: '+ str(left_bowl[:len(left_bowl)//2]))
+            print('New Right Bowl: '+ str(left_bowl[len(left_bowl)//2:]))
             return left_bowl[:len(left_bowl)//2], left_bowl[len(left_bowl)//2:]
 
         elif ">" == result:
+            print('New Left Bowl: ' + str(right_bowl[:len(right_bowl)//2]))
+            print('New Right Bowl: ' + str(right_bowl[len(right_bowl)//2:]))
             return right_bowl[:len(right_bowl)//2], right_bowl[len(right_bowl)//2:]
-            right_bowl = right_bowl[len(right_bowl)//2:]
-
-        print(f"New Left Bowl List: {left_bowl}")
-        print(f"New Right Bowl List: {right_bowl}\n")
-
-        return left_bowl, right_bowl
+        else:
+            raise Exception("Invalid Result!")
 
     def test_find_fake_gold_bar(self):
         answer = ""
@@ -57,8 +53,9 @@ class TestCase(BaseCase):
         self.click('button#weigh')
         self.sleep(5)
         result = self.get_text('.result button#reset')
-        self.assert_false("?" in result)
-        print(f'Result: {result}\n')
+        self.assert_false("?" in result)  # Asserts Result has changed
+        print(f'\nResult: {result}\n')
+        self.save_screenshot_to_logs(name='First Weighting Result')
 
         # If the bowls are equal, the fake bar is "8"
         if "=" == result:
@@ -73,7 +70,7 @@ class TestCase(BaseCase):
 
         # Clear gameboard
         self.click('button#reset:not([disabled]')
-        self.sleep(0.2)
+        self.sleep(0.1)
 
         # Refill bowls with remaining bars from the lighter bowl
         self.fill_left_bowl(left_bowl)
@@ -83,9 +80,10 @@ class TestCase(BaseCase):
         self.click('button#weigh')
         self.sleep(5)
         result = self.get_text('.result button#reset')
+        self.save_screenshot_to_logs(name='Second Weighting Result')
         left_bowl, right_bowl = self.split_weights(result, left_bowl, right_bowl)
         self.click('button#reset:not([disabled]')
-        self.sleep(0.2)
+        self.sleep(0.1)
         self.fill_left_bowl(left_bowl)
         self.fill_right_bowl(right_bowl)
 
@@ -99,5 +97,6 @@ class TestCase(BaseCase):
             answer = ''.join(right_bowl)
         print(f'Answer is Gold Bar Number {answer}')
         self.click(f'.coins > button#coin_{answer}')
-        self.sleep(2)
-        self.save_screenshot_to_logs(name='Fetch Challenge Result')
+        self.sleep(7)
+        # Sbase method to save screenshot of window to "latest_logs" folder
+        self.save_screenshot_to_logs(name='Final Weighting Result')
