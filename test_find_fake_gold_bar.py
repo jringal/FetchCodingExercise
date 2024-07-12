@@ -36,6 +36,7 @@ class TestCase(BaseCase):
         answer = ""
         left_bowl = ['0','1','2','3']
         right_bowl = ['4','5','6','7']
+        weighings = []
 
         # Open exercise page
         self.open('http://sdetchallenge.fetch.com')
@@ -61,7 +62,12 @@ class TestCase(BaseCase):
             print(f'Answer is Gold Bar Number {answer}')
             self.jquery_click('button#coin_8')
             self.switch_to_alert()
-            self.assert_true("Yay! You find it!" == self.accept_alert())
+            alert_message = self.accept_alert()
+            print(alert_message)
+            self.assert_true("Yay! You find it!" == alert_message)
+            for i in range(1, len(self.find_elements('.game-info li')) + 1):
+                weighings = weighings.append(f'.game-info li:nth-child[{i}]')
+            print(f'Weighings: {weighings}')
             self.save_screenshot_to_logs(name='Weighting Result')
             return
         
@@ -98,5 +104,10 @@ class TestCase(BaseCase):
         print(f'Answer is Gold Bar Number {answer}')
         self.jquery_click(f'.coins > button#coin_{answer}')
         self.switch_to_alert()
-        self.assert_true("Yay! You find it!" == self.accept_alert())
+        alert_message = self.accept_alert()
+        print(alert_message)
+        self.assert_true("Yay! You find it!" == alert_message)
+        for i in range(1, len(self.find_elements('.game-info li')) + 1):
+            weighings.append(self.get_text(f'.game-info li:nth-child({i})'))
+        print(f'Weighings: {weighings}')
         self.save_screenshot_to_logs(name='Final Weighting Result')
