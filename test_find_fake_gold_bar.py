@@ -18,16 +18,16 @@ class TestCase(BaseCase):
 
     # Function to split the lighter bowl in half to the left and right bowls
     def split_weights(self, result="", left_bowl=[], right_bowl=[]):
-        print(f'Old Left Bowl: {left_bowl}')
-        print(f'Old Right Bowl: {right_bowl}')
+        # print(f'Old Left Bowl: {left_bowl}')
+        # print(f'Old Right Bowl: {right_bowl}')
         if "<" == result:
-            print('New Left Bowl: '+ str(left_bowl[:len(left_bowl)//2]))
-            print('New Right Bowl: '+ str(left_bowl[len(left_bowl)//2:]))
+            # print('New Left Bowl: '+ str(left_bowl[:len(left_bowl)//2]))
+            # print('New Right Bowl: '+ str(left_bowl[len(left_bowl)//2:]))
             return left_bowl[:len(left_bowl)//2], left_bowl[len(left_bowl)//2:]
 
         elif ">" == result:
-            print('New Left Bowl: ' + str(right_bowl[:len(right_bowl)//2]))
-            print('New Right Bowl: ' + str(right_bowl[len(right_bowl)//2:]))
+            # print('New Left Bowl: ' + str(right_bowl[:len(right_bowl)//2]))
+            # print('New Right Bowl: ' + str(right_bowl[len(right_bowl)//2:]))
             return right_bowl[:len(right_bowl)//2], right_bowl[len(right_bowl)//2:]
         else:
             raise Exception("Invalid Result!")
@@ -53,7 +53,7 @@ class TestCase(BaseCase):
         self.wait_for_text_not_visible('?', '.result button#reset')
         result = self.get_text('.result button#reset')
         self.assert_false("?" in result)  # Asserts Result has changed
-        print(f'\nResult: {result}\n')
+        # print(f'\nResult: {result}\n')
         self.save_screenshot_to_logs(name='First Weighting Result')
 
         # If the bowls are equal, the fake bar is "8"
@@ -65,9 +65,9 @@ class TestCase(BaseCase):
             alert_message = self.accept_alert()
             print(alert_message)
             self.assert_true("Yay! You find it!" == alert_message)
-            for i in range(1, len(self.find_elements('.game-info li')) + 1):
-                weighings = weighings.append(f'.game-info li:nth-child[{i}]')
-            print(f'Weighings: {weighings}')
+            print("Number of Weighings: 1" )
+            weighings.append('[0,1,2,3] = [4,5,6,7]')
+            print(f'Weighings List: {weighings}')
             self.save_screenshot_to_logs(name='Weighting Result')
             return
         
@@ -101,13 +101,16 @@ class TestCase(BaseCase):
             answer = ''.join(left_bowl)
         elif ">" in result:
             answer = ''.join(right_bowl)
-        print(f'Answer is Gold Bar Number {answer}')
+
+        # Output Answer, Alert, and Weighings
+        print(f'\nAnswer is Gold Bar Number {answer}')
         self.jquery_click(f'.coins > button#coin_{answer}')
         self.switch_to_alert()
         alert_message = self.accept_alert()
         print(alert_message)
         self.assert_true("Yay! You find it!" == alert_message)
+        print("Number of Weighings: " + str(len(self.find_elements('.game-info li'))))
         for i in range(1, len(self.find_elements('.game-info li')) + 1):
             weighings.append(self.get_text(f'.game-info li:nth-child({i})'))
-        print(f'Weighings: {weighings}')
+        print(f'Weighings List: {weighings}')
         self.save_screenshot_to_logs(name='Final Weighting Result')
