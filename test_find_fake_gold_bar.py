@@ -8,7 +8,6 @@ class TestCase(BaseCase):
             self.type(
                 f'input[data-side="left"][data-index="{i}"]', bar_list[i]
             )
-            self.sleep(0.1)
 
     # Function to fill right bowl with entered list
     def fill_right_bowl(self, bar_list=[]):
@@ -16,7 +15,6 @@ class TestCase(BaseCase):
             self.type(
                 f'input[data-side="right"][data-index="{i}"]', bar_list[i]
             )
-            self.sleep(0.1)
 
     # Function to split the lighter bowl in half to the left and right bowls
     def split_weights(self, result="", left_bowl=[], right_bowl=[]):
@@ -51,7 +49,7 @@ class TestCase(BaseCase):
 
         # Click the Weight button and assess results
         self.click('button#weigh')
-        self.sleep(5)
+        self.wait_for_text_not_visible('?', '.result button#reset')
         result = self.get_text('.result button#reset')
         self.assert_false("?" in result)  # Asserts Result has changed
         print(f'\nResult: {result}\n')
@@ -60,9 +58,11 @@ class TestCase(BaseCase):
         # If the bowls are equal, the fake bar is "8"
         if "=" == result:
             answer = "8"
-            print(f'Gold Bar Number {answer} is the fake bar!')
-            self.click('button#coin_8')
-            self.sleep(2)
+            print(f'Answer is Gold Bar Number {answer}')
+            self.jquery_click('button#coin_8')
+            self.switch_to_alert()
+            self.assert_true("Yay! You find it!" == self.accept_alert())
+            self.save_screenshot_to_logs(name='Weighting Result')
             return
         
         # Otherwise, split the lighter bowl into the two bowls
@@ -70,7 +70,7 @@ class TestCase(BaseCase):
 
         # Clear gameboard
         self.click('button#reset:not([disabled]')
-        self.sleep(0.1)
+        self.wait_for_text('?', '.result button#reset')
 
         # Refill bowls with remaining bars from the lighter bowl
         self.fill_left_bowl(left_bowl)
@@ -78,25 +78,25 @@ class TestCase(BaseCase):
 
         # Repeat previous steps to check results and resplit the bowls
         self.click('button#weigh')
-        self.sleep(5)
+        self.wait_for_text_not_visible('?', '.result button#reset')
         result = self.get_text('.result button#reset')
         self.save_screenshot_to_logs(name='Second Weighting Result')
         left_bowl, right_bowl = self.split_weights(result, left_bowl, right_bowl)
         self.click('button#reset:not([disabled]')
-        self.sleep(0.1)
+        self.wait_for_text('?', '.result button#reset')
         self.fill_left_bowl(left_bowl)
         self.fill_right_bowl(right_bowl)
 
         # Down to 2 last bars, the lighter bowl is the answer
         self.click('button#weigh')
-        self.sleep(5)
+        self.wait_for_text_not_visible('?', '.result button#reset')
         result = self.get_text('.result button#reset')
         if "<" in result:
             answer = ''.join(left_bowl)
         elif ">" in result:
             answer = ''.join(right_bowl)
         print(f'Answer is Gold Bar Number {answer}')
-        self.click(f'.coins > button#coin_{answer}')
-        self.sleep(7)
-        # Sbase method to save screenshot of window to "latest_logs" folder
+        self.jquery_click(f'.coins > button#coin_{answer}')
+        self.switch_to_alert()
+        self.assert_true("Yay! You find it!" == self.accept_alert())
         self.save_screenshot_to_logs(name='Final Weighting Result')
